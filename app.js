@@ -50,7 +50,12 @@ app.use("/api/notices", noticesRouter);
 app.use("/api/applications", applicationsRouter);
 app.use("/api/events", eventsRouter);
 
-app.use("/", express.static("../info-system-frontend/build"));
+app.use("/", express.static("../info-system-web/build"));
+app.use("/notices", express.static("../info-system-web/build"));
+app.use("/login", express.static("../info-system-web/build"));
+app.use("/mentors", express.static("../info-system-web/build"));
+app.use("/about", express.static("../info-system-web/build"));
+app.use("/profile", express.static("../info-system-web/build"));
 
 app.use((req, res, next) => {
   next(createError(404));
