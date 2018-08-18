@@ -1,5 +1,6 @@
 const createError = require("http-errors");
 const express = require("express");
+const helmet = require("helmet");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const mongoose = require("mongoose");
@@ -37,6 +38,7 @@ app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(helmet());
 
 app.use("/api/auth", authRouter);
 app.use("/api/users/students", studentsRouter);
@@ -50,13 +52,11 @@ app.use("/api/notices", noticesRouter);
 app.use("/api/applications", applicationsRouter);
 app.use("/api/events", eventsRouter);
 
-app.use(express.static("static"));
-app.use("/", express.static("../info-system-web/build"));
-app.use("/notices", express.static("../info-system-web/build"));
-app.use("/login", express.static("../info-system-web/build"));
-app.use("/mentors", express.static("../info-system-web/build"));
-app.use("/about", express.static("../info-system-web/build"));
-app.use("/profile", express.static("../info-system-web/build"));
+app.use(express.static("../info-system-web/build"));
+
+app.get("*", (req, res) => {
+  res.sendFile("../info-system-web/build/index.html");
+});
 
 app.use((req, res, next) => {
   next(createError(404));
