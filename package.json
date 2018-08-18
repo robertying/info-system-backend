@@ -5,7 +5,7 @@
   "author": "Robert Ying <yingrui205@gmail.com>",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "concurrently \".\\data\\setup.bat\" \"set DEBUG=info-system-backend:* & node ./bin/www\""
   },
   "dependencies": {
     "bcryptjs": "latest",

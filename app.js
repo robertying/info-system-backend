@@ -50,6 +50,7 @@ app.use("/api/notices", noticesRouter);
 app.use("/api/applications", applicationsRouter);
 app.use("/api/events", eventsRouter);
 
+app.use(express.static("static"));
 app.use("/", express.static("../info-system-web/build"));
 app.use("/notices", express.static("../info-system-web/build"));
 app.use("/login", express.static("../info-system-web/build"));
