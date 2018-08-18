@@ -5,6 +5,7 @@ const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const mongoose = require("mongoose");
 const autoIncrement = require("mongoose-auto-increment");
+const path = require("path");
 
 /**
  * Open database.
@@ -34,11 +35,13 @@ const eventsRouter = require("./routes/events");
 
 const app = express();
 
+app.use(helmet());
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(helmet());
+
+app.use(express.static(path.join(__dirname, "../info-system-web/build")));
 
 app.use("/api/auth", authRouter);
 app.use("/api/users/students", studentsRouter);
@@ -52,10 +55,8 @@ app.use("/api/notices", noticesRouter);
 app.use("/api/applications", applicationsRouter);
 app.use("/api/events", eventsRouter);
 
-app.use(express.static("../info-system-web/build"));
-
 app.get("*", (req, res) => {
-  res.sendFile("../info-system-web/build/index.html");
+  res.sendFile(path.join(__dirname, "../info-system-web/build/index.html"));
 });
 
 app.use((req, res, next) => {
