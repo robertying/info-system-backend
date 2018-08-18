@@ -41,6 +41,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
+app.use(function(req, res, next) {
+  if (!req.secure) {
+    return res.redirect(["https://", req.get("Host"), req.url].join(""));
+  }
+  next();
+});
+
 app.use(express.static(path.join(__dirname, "../info-system-web/build")));
 
 app.use("/api/auth", authRouter);
