@@ -7,6 +7,7 @@
 const app = require("../app");
 const debug = require("debug")("info-system-backend:server");
 const http2 = require("spdy");
+const http = require("http");
 const fs = require("fs");
 
 const httpsOptions = {
@@ -46,6 +47,11 @@ app.set("port", port);
  */
 
 const server = http2.createServer(httpsOptions, app);
+const http = http
+  .createServer((req, res) => {
+    res.redirect("https://" + req.headers.host + req.url);
+  })
+  .listen(8080);
 
 /**
  * Event listener for HTTP server "error" event.
