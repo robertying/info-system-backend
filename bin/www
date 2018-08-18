@@ -6,12 +6,12 @@
 
 const app = require("../app");
 const debug = require("debug")("info-system-backend:server");
-const http2 = require("http");
+const http2 = require("spdy");
 const fs = require("fs");
 
 const httpsOptions = {
-  key: fs.readFileSync("./config/key.pem"),
-  cert: fs.readFileSync("./config/cert.pem")
+  key: fs.readFileSync("/etc/letsencrypt/live/info.eesast.com/privkey.pem"),
+  cert: fs.readFileSync("/etc/letsencrypt/live/info.eesast.com/fullchain.pem")
 };
 
 /**
@@ -25,7 +25,7 @@ app.set("port", port);
  * Create HTTP server.
  */
 
-var server = http2.createServer(app);
+var server = http2.createServer(httpsOptions, app);
 
 /**
  * Listen on provided port, on all network interfaces.
