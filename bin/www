@@ -11,8 +11,8 @@ const http = require("http");
 const fs = require("fs");
 
 const httpsOptions = {
-  key: fs.readFileSync("/etc/letsencrypt/live/info.eesast.com/privkey.pem"),
-  cert: fs.readFileSync("/etc/letsencrypt/live/info.eesast.com/fullchain.pem")
+  key: fs.readFileSync("/etc/letsencrypt/live/info.thuee.org/privkey.pem"),
+  cert: fs.readFileSync("/etc/letsencrypt/live/info.thuee.org/fullchain.pem")
 };
 
 /**
@@ -47,9 +47,10 @@ app.set("port", port);
  */
 
 const server = http2.createServer(httpsOptions, app);
-const http = http
+const redirect = http
   .createServer((req, res) => {
-    res.redirect("https://" + req.headers.host + req.url);
+    res.writeHead(301, { "Location": "https://" + req.headers.host + req.url });
+    res.end();
   })
   .listen(8080);
 
