@@ -12,6 +12,7 @@ const router = express.Router();
  * 获得所有申请，可使用参数过滤
  * @param {Number} applicantId 申请者 ID
  * @param {String} applicantName 申请者姓名
+ * @param {String} teacherName 导师姓名
  * @param {String} applicationType 选择想要返回的申请类型的具体内容
  * @param {Number} begin 分页用
  * @param {Number} end 分页用
