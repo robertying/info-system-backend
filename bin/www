@@ -10,11 +10,6 @@ const http2 = require("spdy");
 const http = require("http");
 const fs = require("fs");
 
-const httpsOptions = {
-  key: fs.readFileSync("/etc/letsencrypt/live/info.thuee.org/privkey.pem"),
-  cert: fs.readFileSync("/etc/letsencrypt/live/info.thuee.org/fullchain.pem")
-};
-
 /**
  * Normalize a port into a number, string, or false.
  */
@@ -45,14 +40,24 @@ app.set("port", port);
 /**
  * Create HTTPS server.
  */
+let server;
+if (process.env.NODE_ENV === "production") {
+  const httpsOptions = {
+    key: fs.readFileSync("/etc/letsencrypt/live/info.thuee.org/privkey.pem"),
+    cert: fs.readFileSync("/etc/letsencrypt/live/info.thuee.org/fullchain.pem")
+  };
 
-const server = http2.createServer(httpsOptions, app);
-const redirect = http
-  .createServer((req, res) => {
-    res.writeHead(301, { "Location": "https://" + req.headers.host + req.url });
-    res.end();
-  })
-  .listen(8080);
+  server = http2.createServer(httpsOptions, app);
+
+  const redirect = http
+    .createServer((req, res) => {
+      res.writeHead(301, { Location: "https://" + req.headers.host + req.url });
+      res.end();
+    })
+    .listen(8080);
+} else {
+  server = http.createServer(app);
+}
 
 /**
  * Event listener for HTTP server "error" event.
