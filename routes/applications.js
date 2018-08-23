@@ -2,6 +2,7 @@ const express = require("express");
 const _ = require("lodash");
 const Application = require("../models/application");
 const Teacher = require("../models/teacher");
+const Student = require("../models/student");
 const existenceVerifier = require("../helpers/existenceVerifier");
 const verifyToken = require("../middlewares/verifyToken");
 const verifyAuthorizations = require("../middlewares/verifyAuthorizations");
@@ -211,11 +212,46 @@ router.put(
       application.updatedAt = new Date().toISOString();
       application.updatedBy = req.id;
 
-      application.save(err => {
+      application.save(async err => {
         if (err) {
           res.status(500).send("500 Internal server error.");
         } else {
           res.status(204).send("204 No Content.");
+
+          const student = await existenceVerifier(Student, {
+            id: application.applicantId
+          });
+          if (!student.email) {
+            return;
+          }
+          const html = emailTemplate(
+            student.name,
+            "新生导师申请",
+            `您的新生导师申请状态已更新`,
+            `您的新生导师申请状态已更新`,
+            `当前申请状态：\n${Object.values(application.mentor.status)[0]}`,
+            "",
+            "https://info.thuee.org",
+            "查看新生导师申请状态"
+          );
+          const emailOptions = {
+            from: '"电子系信息管理系统" <noreply@thuee.org>', // sender address
+            to: student.email, // list of receivers
+            subject: "【新生导师】您的新生导师申请状态已更新", // Subject line
+            text: `${
+              student.name
+            }，您好\n您的新生导师申请状态已更新\n当前申请状态：\n${
+              Object.values(application.mentor.status)[0]
+            }\n请您前往 https://info.thuee.org 查看详情。`, // plain text body
+            html: html // html body
+          };
+
+          emailSender.sendMail(emailOptions, (err, info) => {
+            if (err) {
+              return console.log(err);
+            }
+            console.log("Message sent: %s", info.messageId);
+          });
         }
       });
     }
