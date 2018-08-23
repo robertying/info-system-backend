@@ -162,7 +162,7 @@ router.post(
             html: html // html body
           };
 
-          emailSender.sendMail(mailOptions, (err, info) => {
+          emailSender.sendMail(emailOptions, (err, info) => {
             if (err) {
               return console.log(err);
             }
