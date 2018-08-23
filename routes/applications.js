@@ -1,9 +1,12 @@
 const express = require("express");
 const _ = require("lodash");
 const Application = require("../models/application");
+const Teacher = require("../models/teacher");
 const existenceVerifier = require("../helpers/existenceVerifier");
 const verifyToken = require("../middlewares/verifyToken");
 const verifyAuthorizations = require("../middlewares/verifyAuthorizations");
+const emailTemplate = require("../config/email");
+const emailSender = require("../helpers/emailSender");
 
 const router = express.Router();
 
@@ -124,12 +127,47 @@ router.post(
     } else {
       req.body.createdBy = req.id;
       const newApplication = new Application(req.body);
-      newApplication.save((err, application) => {
+      newApplication.save(async (err, application) => {
         if (err) {
           res.status(500).send("500 Internal server error.");
         } else {
           res.setHeader("Location", "/applications/" + application._id);
           res.status(201).send("201 Created.");
+
+          const teacher = await existenceVerifier(Teacher, {
+            name: Object.keys(application.mentor.status)[0]
+          });
+          if (!teacher.email) {
+            return;
+          }
+          const html = emailTemplate(
+            teacher.name,
+            "新生导师申请",
+            `您有一份来自 ${application.applicantName} 同学的新生导师申请`,
+            `您有一份来自 ${application.applicantName} 同学的新生导师申请`,
+            `申请陈述：\n${application.mentor.contents.statement}`,
+            "请您及时处理同学的申请，谢谢！",
+            "https://info.thuee.org",
+            "处理新生导师申请"
+          );
+          const emailOptions = {
+            from: '"电子系信息管理系统" <noreply@thuee.org>', // sender address
+            to: teacher.email, // list of receivers
+            subject: "【新生导师】您收到了一份新的申请", // Subject line
+            text: `${teacher.name}，您好\n您有一份来自 ${
+              application.applicantName
+            } 同学的新生导师申请\n申请陈述：\n${
+              application.mentor.contents.statement
+            }\n请您及时前往 https://info.thuee.org 处理同学的申请，谢谢！`, // plain text body
+            html: html // html body
+          };
+
+          emailSender.sendMail(mailOptions, (err, info) => {
+            if (err) {
+              return console.log(err);
+            }
+            console.log("Message sent: %s", info.messageId);
+          });
         }
       });
     }
