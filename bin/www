@@ -9,6 +9,51 @@ const debug = require("debug")("info-system-backend:server");
 const http2 = require("spdy");
 const http = require("http");
 const fs = require("fs");
+const nodemailer = require("nodemailer");
+const SMTPServer = require("smtp-server").SMTPServer;
+
+const emailServer = new SMTPServer({
+  secure: true,
+  key: fs.readFileSync("/etc/letsencrypt/live/smtp.thuee.org/privkey.pem"),
+  cert: fs.readFileSync("/etc/letsencrypt/live/smtp.thuee.org/fullchain.pem"),
+  onAuth(auth, session, callback) {
+    if (auth.username !== "thuee.org" || auth.password !== "email") {
+      return callback(new Error("Invalid username or password"));
+    }
+  }
+});
+emailServer.listen(465);
+emailServer.on("error", err => {
+  console.log("Error %s", err.message);
+});
+
+const transporter = nodemailer.createTransport({
+  host: "smtp.thuee.org",
+  port: 465,
+  auth: {
+    user: "thuee.org",
+    pass: "email"
+  }
+});
+let mailOptions = {
+  from: '"电子系信息系统" <noreply@thuee.org>', // sender address
+  to: "245978916@qq.com", // list of receivers
+  subject: "Hello ✔", // Subject line
+  text: "Hello world?", // plain text body
+  html: "<b>Hello world?</b>" // html body
+};
+// send mail with defined transport object
+transporter.sendMail(mailOptions, (error, info) => {
+  if (error) {
+    return console.log(error);
+  }
+  console.log("Message sent: %s", info.messageId);
+  // Preview only available when sending through an Ethereal account
+  console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
+
+  // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
+  // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
+});
 
 /**
  * Normalize a port into a number, string, or false.
