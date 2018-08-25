@@ -142,7 +142,7 @@ router.post(
           teacher.save();
 
           const student = await existenceVerifier(Student, {
-            id: applicantId
+            id: req.body.applicantId
           });
 
           if (!teacher.email) {
@@ -238,7 +238,7 @@ router.put(
             "新生导师申请",
             `您的新生导师申请状态已更新`,
             `您的新生导师申请状态已更新`,
-            `当前申请状态：\n${Object.values(application.mentor.status)[0]}`,
+            `当前申请状态：${Object.values(application.mentor.status)[0]}`,
             "",
             "https://info.thuee.org",
             "查看新生导师申请状态"
