@@ -15,6 +15,7 @@
     department: '电子系',
     infoUpdated: 2018,
     receiveFull: 2018,
+    totalApplications: 10,
 
     createdAt: '2018-05-16T17:01:42.346Z',
     createdBy: '张三',
@@ -34,6 +35,7 @@ const teacherSchema = new mongoose.Schema(
     department: String,
     infoUpdated: Number,
     receiveFull: Number,
+    totalApplications: Number,
 
     createdAt: { type: Date, default: Date.now },
     createdBy: String,

@@ -135,9 +135,16 @@ router.post(
           res.setHeader("Location", "/applications/" + application._id);
           res.status(201).send("201 Created.");
 
-          const teacher = await existenceVerifier(Teacher, {
+          let teacher = await existenceVerifier(Teacher, {
             name: Object.keys(application.mentor.status)[0]
           });
+          teacher.totalApplications = teacher.totalApplications + 1;
+          teacher.save();
+
+          const student = await existenceVerifier(Student, {
+            id: applicantId
+          });
+
           if (!teacher.email) {
             return;
           }
@@ -159,6 +166,8 @@ router.post(
               application.applicantName
             } 同学的新生导师申请\n申请陈述：\n${
               application.mentor.contents.statement
+            }\n邮箱：${student.email}\n手机：${
+              student.phone
             }\n请您及时前往 https://info.thuee.org 处理同学的申请，谢谢！`, // plain text body
             html: html // html body
           };
