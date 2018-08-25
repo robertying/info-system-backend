@@ -153,7 +153,9 @@ router.post(
             "新生导师申请",
             `您有一份来自 ${application.applicantName} 同学的新生导师申请`,
             `您有一份来自 ${application.applicantName} 同学的新生导师申请`,
-            `申请陈述：\n${application.mentor.contents.statement}`,
+            `申请陈述：\n${application.mentor.contents.statement}\n\n邮箱：${
+              student.email
+            }\n手机：${student.phone}`,
             "请您及时处理同学的申请，谢谢！",
             "https://info.thuee.org",
             "处理新生导师申请"
@@ -249,7 +251,7 @@ router.put(
             subject: "【新生导师】您的新生导师申请状态已更新", // Subject line
             text: `${
               student.name
-            }，您好\n您的新生导师申请状态已更新\n当前申请状态：\n${
+            }，您好\n您的新生导师申请状态已更新\n当前申请状态：${
               Object.values(application.mentor.status)[0]
             }\n请您前往 https://info.thuee.org 查看详情。`, // plain text body
             html: html // html body
