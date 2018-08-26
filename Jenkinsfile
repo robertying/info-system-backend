@@ -17,12 +17,21 @@ npm install -g forever'''
     stage('Build') {
       steps {
         copyArtifacts(projectName: 'info-system-web/master', excludes: 'pipeline.log', fingerprintArtifacts: true)
+        sh '''tar -xvzf build.tar.gz
+rm build.tar.gz'''
+      }
+    }
+    stage('Archive') {
+      steps {
+        sh 'tar czf build.tar.gz .'
+        archiveArtifacts(artifacts: 'build.tar.gz', fingerprint: true, onlyIfSuccessful: true)
       }
     }
     stage('Deploy') {
       steps {
-        sh '''tar -xvzf build.tar.gz
-NODE_ENV=production forever start bin/www'''
+        sh '''rm -rf /home/express/info-system
+tar xvf build.tar.gz -C /home/express/info-system
+'''
       }
     }
   }
