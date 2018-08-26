@@ -34,7 +34,7 @@ const normalizePort = val => {
  * Get port from environment and store in Express.
  */
 
-const port = normalizePort(process.env.PORT || "3001");
+const port = normalizePort(process.env.PORT || "3000");
 app.set("port", port);
 
 /**
@@ -48,13 +48,6 @@ if (process.env.NODE_ENV === "production") {
   };
 
   server = http2.createServer(httpsOptions, app);
-
-  const redirect = http
-    .createServer((req, res) => {
-      res.writeHead(301, { Location: "https://" + req.headers.host + req.url });
-      res.end();
-    })
-    .listen(8080);
 } else {
   server = http.createServer(app);
 }
