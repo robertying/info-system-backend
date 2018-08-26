@@ -21,7 +21,8 @@ npm install -g forever'''
     }
     stage('Deploy') {
       steps {
-        sh 'NODE_ENV=production forever start bin/www'
+        sh '''tar -xvzf build.tar.gz
+NODE_ENV=production forever start bin/www'''
       }
     }
   }
