@@ -16,7 +16,7 @@ npm install -g forever'''
     }
     stage('Build') {
       steps {
-        copyArtifacts(projectName: 'info-system-web', excludes: 'pipeline.log', target: '.')
+        copyArtifacts(projectName: 'info-system-web', excludes: 'pipeline.log', fingerprintArtifacts: true)
       }
     }
     stage('Deploy') {
