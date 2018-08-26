@@ -1,11 +1,11 @@
 const createError = require("http-errors");
 const express = require("express");
-const proxy = require("http-proxy-middleware");
 const helmet = require("helmet");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const mongoose = require("mongoose");
 const autoIncrement = require("mongoose-auto-increment");
+const path = require("path");
 
 /**
  * Open database.
@@ -41,12 +41,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-if (process.env.NODE_ENV === "production") {
-  app.use(
-    "/api",
-    proxy({ target: "https://info.thuee.org", changeOrigin: true })
-  );
-}
+app.use(express.static(path.join(__dirname, "../info-system-web/build")));
 
 app.use("/api/auth", authRouter);
 app.use("/api/users/students", studentsRouter);
@@ -59,6 +54,10 @@ app.use("/api/files", filesRouter);
 app.use("/api/notices", noticesRouter);
 app.use("/api/applications", applicationsRouter);
 app.use("/api/events", eventsRouter);
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../info-system-web/build/index.html"));
+});
 
 app.use((req, res, next) => {
   next(createError(404));
