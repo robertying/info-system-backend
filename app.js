@@ -41,7 +41,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-app.use(express.static(path.join(__dirname, "../info-system-web/build")));
+app.use(express.static(path.join(__dirname, "build")));
 
 app.use("/api/auth", authRouter);
 app.use("/api/users/students", studentsRouter);
@@ -56,7 +56,7 @@ app.use("/api/applications", applicationsRouter);
 app.use("/api/events", eventsRouter);
 
 app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../info-system-web/build/index.html"));
+  res.sendFile(path.join(__dirname, "build/index.html"));
 });
 
 app.use((req, res, next) => {
