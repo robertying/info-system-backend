@@ -2,7 +2,7 @@ pipeline {
   agent {
     docker {
       image 'node:10-alpine'
-      args '-p 3001:3001'
+      args '-p 4001:4001'
     }
 
   }
@@ -23,16 +23,18 @@ rm build.tar.gz'''
     }
     stage('Archive') {
       steps {
-        sh 'tar czf build.tar.gz .'
-        archiveArtifacts(artifacts: 'build.tar.gz', fingerprint: true, onlyIfSuccessful: true)
+        sh '''base=$(basename $PWD)
+cd ..
+tar -czf info-system.tar.gz $base'''
+        archiveArtifacts(artifacts: 'info-system.tar.gz', fingerprint: true, onlyIfSuccessful: true)
       }
     }
     stage('Deploy') {
       steps {
-        sh '''tar xf build.tar.gz
+        sh '''tar xf info-system.tar.gz
 rm -rf /home/express/info-system
-mv build /home/express/info-system
-rm -rf build'''
+mv info-system /home/express/
+rm -rf info-system'''
       }
     }
   }
