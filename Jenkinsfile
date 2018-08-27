@@ -25,7 +25,8 @@ rm build.tar.gz'''
       steps {
         sh '''base=$(basename $PWD)
 cd ..
-tar -czf info-system.tar.gz $base'''
+tar -czf info-system.tar.gz $base
+cd $base'''
         archiveArtifacts(artifacts: 'info-system.tar.gz', fingerprint: true, onlyIfSuccessful: true)
       }
     }
