@@ -29,9 +29,10 @@ rm build.tar.gz'''
     }
     stage('Deploy') {
       steps {
-        sh '''rm -rf /home/express/info-system
-tar xvf build.tar.gz -C /home/express/info-system
-'''
+        sh '''tar xvf build.tar.gz
+mv build info-system
+docker cp build:/home/express/
+rm -rf info-system'''
       }
     }
   }
