@@ -23,15 +23,17 @@ rm build.tar.gz'''
     }
     stage('Archive') {
       steps {
-        sh 'tar czf build.tar.gz .'
+        sh '''base=$(basename $PWD)
+cd ..
+tar czf $base/build.tar.gz $base
+cd $base'''
         archiveArtifacts(artifacts: 'build.tar.gz', fingerprint: true, onlyIfSuccessful: true)
       }
     }
     stage('Deploy') {
       steps {
         sh '''rm build.tar.gz
-rm -rf /home/express/info-system
-mkdir /home/express/info-system
+rm -rf /home/express/info-system/*
 cp -r * /home/express/info-system/
 '''
       }
