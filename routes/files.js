@@ -8,7 +8,7 @@ const verifyAuthorizations = require("../middlewares/verifyAuthorizations");
 const router = express.Router();
 const publicStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "./data/files/public");
+    cb(null, "../files/public");
   },
   filename: (req, file, cb) => {
     const n = file.originalname.lastIndexOf(".");
@@ -21,7 +21,7 @@ const publicStorage = multer.diskStorage({
 });
 const privateStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "./data/files/private");
+    cb(null, "../files/private");
   },
   filename: (req, file, cb) => {
     const n = file.originalname.lastIndexOf(".");
@@ -45,10 +45,10 @@ const privateType = privateFile.single("file");
  */
 router.get("/public/:filename", verifyToken, (req, res) => {
   const filename = req.params.filename;
-  if (!fs.existsSync("./data/files/public/" + filename)) {
+  if (!fs.existsSync("../files/public/" + filename)) {
     return res.status(404).send("404 Not Found: File not exists.");
   }
-  res.download("./data/files/public/" + filename, filename, err => {
+  res.download("../files/public/" + filename, filename, err => {
     if (err) {
       return res.status(500).send("500 Internal server error.");
     }
@@ -83,10 +83,10 @@ router.delete(
   verifyAuthorizations(["write"]),
   (req, res) => {
     const filename = req.params.filename;
-    if (!fs.existsSync("./data/files/public/" + filename)) {
+    if (!fs.existsSync("../files/public/" + filename)) {
       return res.status(404).send("404 Not Found: File not exists.");
     }
-    fs.unlink("./data/files/public/" + filename, err => {
+    fs.unlink("../files/public/" + filename, err => {
       if (err) {
         return res.status(500).send("500 Internal server error.");
       } else {
@@ -108,10 +108,10 @@ router.get(
   verifyAuthorizations(["read"]),
   (req, res) => {
     const filename = req.params.filename;
-    if (!fs.existsSync("./data/files/private/" + filename)) {
+    if (!fs.existsSync("../files/private/" + filename)) {
       return res.status(404).send("404 Not Found: File not exists.");
     }
-    res.download("./data/files/private/" + filename, filename, err => {
+    res.download("../files/private/" + filename, filename, err => {
       if (err) {
         return res.status(500).send("500 Internal server error.");
       }
@@ -141,10 +141,10 @@ router.delete(
   verifyAuthorizations(["write"]),
   (req, res) => {
     const filename = req.params.filename;
-    if (!fs.existsSync("./data/files/private/" + filename)) {
+    if (!fs.existsSync("../files/private/" + filename)) {
       return res.status(404).send("404 Not Found: File not exists.");
     }
-    fs.unlink("./data/files/private/" + filename, err => {
+    fs.unlink("../files/private/" + filename, err => {
       if (err) {
         return res.status(500).send("500 Internal server error.");
       } else {
