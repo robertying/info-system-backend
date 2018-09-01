@@ -1,6 +1,7 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+const isNumber = require("is-number");
 
 const authConfig = require("../config/auth");
 const Student = require("../models/student");
@@ -21,11 +22,16 @@ router.post("/", async (req, res) => {
       .status(422)
       .send("422 Unprocessable Entity: Missing essential post data.");
   } else {
-    const studentExists = await existenceVerifier(Student, { id: req.body.id });
-    const reviewerExists = await existenceVerifier(Reviewer, {
-      id: req.body.id
+    const numberId = isNumber(req.body.id);
+    const studentExists = await existenceVerifier(Student, {
+      [numberId ? id : email]: req.body.id
     });
-    const teacherExists = await existenceVerifier(Teacher, { id: req.body.id });
+    const reviewerExists = await existenceVerifier(Reviewer, {
+      [numberId ? id : email]: req.body.id
+    });
+    const teacherExists = await existenceVerifier(Teacher, {
+      [numberId ? id : email]: req.body.id
+    });
 
     let user, role;
     if (studentExists) {
