@@ -59,7 +59,9 @@ router.post("/", async (req, res) => {
     const token = jwt.sign({ id: user.id }, authConfig.secret, {
       expiresIn: "1h"
     });
-    return res.status(200).send({ auth: true, token, name: user.name, role });
+    return res
+      .status(200)
+      .send({ auth: true, token, id: user.id, name: user.name, role });
   }
 });
 
