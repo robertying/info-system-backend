@@ -9,9 +9,7 @@ pipeline {
   stages {
     stage('Install') {
       steps {
-        sh '''npm config set unsafe-perm true
-npm install
-npm install -g forever'''
+        sh 'npm install'
       }
     }
     stage('Build') {
