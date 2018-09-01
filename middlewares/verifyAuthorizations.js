@@ -12,7 +12,7 @@ const verifyAuthorizations = requiredAuthorizations => {
     const id = req.headers["x-access-id"];
 
     if (id) {
-      if (id === req.id) {
+      if (id == req.id) {
         // 通过 x-access-id 访问本人内容，直接放行
         next();
       } else {
