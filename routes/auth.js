@@ -24,13 +24,13 @@ router.post("/", async (req, res) => {
   } else {
     const numberId = isNumber(req.body.id);
     const studentExists = await existenceVerifier(Student, {
-      [numberId ? id : email]: req.body.id
+      [numberId ? "id" : "email"]: req.body.id
     });
     const reviewerExists = await existenceVerifier(Reviewer, {
-      [numberId ? id : email]: req.body.id
+      [numberId ? "id" : "email"]: req.body.id
     });
     const teacherExists = await existenceVerifier(Teacher, {
-      [numberId ? id : email]: req.body.id
+      [numberId ? "id" : "email"]: req.body.id
     });
 
     let user, role;
