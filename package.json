@@ -9,25 +9,25 @@
   },
   "dependencies": {
     "bcryptjs": "latest",
-    "cookie-parser": "~1.4.3",
-    "debug": "~2.6.9",
-    "express": "~4.16.0",
-    "helmet": "^3.13.0",
-    "http-errors": "~1.6.2",
-    "is-number": "^7.0.0",
+    "cookie-parser": "latest",
+    "debug": "latest",
+    "express": "latest",
+    "helmet": "latest",
+    "http-errors": "latest",
+    "is-number": "latest",
     "jsonwebtoken": "latest",
-    "lodash": "^4.17.10",
-    "mongoose": "^5.2.8",
-    "mongoose-auto-increment": "^5.0.1",
-    "morgan": "~1.9.0",
+    "lodash": "latest",
+    "mongoose": "latest",
+    "mongoose-auto-increment": "latest",
+    "morgan": "latest",
     "multer": "latest",
-    "nodemailer": "^4.6.8",
-    "spdy": "^3.4.7"
+    "nodemailer": "latest",
+    "spdy": "latest"
   },
   "devDependencies": {
-    "eslint": "^5.3.0",
-    "eslint-config-prettier": "^3.0.1",
+    "eslint": "latest",
+    "eslint-config-prettier": "latest",
     "eslint-plugin-prettier": "latest",
-    "prettier": "^1.14.2"
+    "prettier": "latest"
   }
 }
