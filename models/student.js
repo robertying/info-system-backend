@@ -14,7 +14,6 @@
     phone: 15600000000,
     class: '无61',
     degree: '本科生',
-    yearOfAdmission: 2016,
     infoUpdated: 2018,
 
     createdAt: '2018-05-16T17:01:42.346Z',
@@ -35,7 +34,6 @@ const studentSchema = new mongoose.Schema(
     phone: Number,
     class: String,
     degree: String,
-    yearOfAdmission: Number,
     infoUpdated: Number,
 
     createdAt: { type: Date, default: Date.now },

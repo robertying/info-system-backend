@@ -21,6 +21,7 @@
 */
 
 const mongoose = require("mongoose");
+const autoIncrement = require("mongoose-auto-increment");
 
 const honorSchema = new mongoose.Schema(
   {
@@ -39,6 +40,7 @@ const honorSchema = new mongoose.Schema(
   }
 );
 
+honorSchema.plugin(autoIncrement.plugin, "Honor");
 const Honor = mongoose.model("Honor", honorSchema);
 
 module.exports = Honor;
