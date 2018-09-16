@@ -24,7 +24,7 @@ db.once("open", () => {
 const studentsRouter = require("./routes/students");
 const reviewersRouter = require("./routes/reviewers");
 const teachersRouter = require("./routes/teachers");
-// const honorsRouter = require("./routes/honors");
+const honorsRouter = require("./routes/honors");
 // const scholarshipsRouter = require("./routes/scholarships");
 // const financialAidRouter = require("./routes/financial-aid");
 const authRouter = require("./routes/auth");
@@ -47,7 +47,7 @@ app.use("/api/auth", authRouter);
 app.use("/api/users/students", studentsRouter);
 app.use("/api/users/reviewers", reviewersRouter);
 app.use("/api/users/teachers", teachersRouter);
-// app.use("/api/honors", honorsRouter);
+app.use("/api/honors", honorsRouter);
 // app.use("/api/scholarships", scholarshipsRouter);
 // app.use("/api/financial-aid", financialAidRouter);
 app.use("/api/files", filesRouter);
