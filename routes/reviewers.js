@@ -42,6 +42,7 @@ router.get("/", verifyToken, verifyAuthorizations(["read"]), (req, res) => {
         reviewer.phone = n.phone;
         reviewer.authorizations = n.authorizations;
         reviewer.infoUpdated = n.infoUpdated;
+        reviewer.grade = n.grade;
         return reviewer;
       });
       res.setHeader("Content-Type", "application/json; charset=utf-8");
@@ -70,6 +71,7 @@ router.get("/:id", verifyToken, verifyAuthorizations(["read"]), (req, res) => {
       returnedReviewer.phone = reviewer.phone;
       returnedReviewer.authorizations = reviewer.authorizations;
       returnedReviewer.infoUpdated = reviewer.infoUpdated;
+      returnedReviewer.grade = reviewer.grade;
 
       res.setHeader("Content-Type", "application/json; charset=utf-8");
       res.status(200).end(JSON.stringify(returnedReviewer));

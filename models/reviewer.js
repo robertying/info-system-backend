@@ -15,6 +15,7 @@
     phone: 15600000000,
     authorizations: ['write', 'read'],
     infoUpdated: 2018,
+    grade: 8,
 
     createdAt: '2018-05-16T17:01:42.346Z',
     createdBy: '张三',
@@ -34,6 +35,7 @@ const reviewerSchema = new mongoose.Schema(
     phone: Number,
     authorizations: [String],
     infoUpdated: Number,
+    grade: Number,
 
     createdAt: { type: Date, default: Date.now },
     createdBy: String,
