@@ -16,6 +16,7 @@ const router = express.Router();
  * 获得所有申请，可使用参数过滤
  * @param {Number} applicantId 申请者 ID
  * @param {String} applicantName 申请者姓名
+ * @param {String} applicantGrade 申请者年级
  * @param {String} teacherName 导师姓名
  * @param {String} applicationType 选择想要返回的申请类型的具体内容
  * @param {Number} begin 分页用
@@ -27,10 +28,12 @@ router.get("/", verifyToken, verifyAuthorizations(["read"]), (req, res) => {
   const end = req.query.end || Number.MAX_SAFE_INTEGER;
   const applicationType = req.query.applicationType;
   const teacherName = req.query.teacherName;
+  const applicantGrade = req.query.applicantGrade;
   delete req.query.begin;
   delete req.query.end;
   delete req.query.applicationType;
   delete req.query.teacherName;
+  delete req.query.applicantGrade;
 
   Object.keys(req.query).forEach(
     key => req.query[key] == null && delete req.query[key]
@@ -41,30 +44,43 @@ router.get("/", verifyToken, verifyAuthorizations(["read"]), (req, res) => {
     .skip(begin - 1)
     .limit(end - begin + 1);
 
-  query.exec((err, applications) => {
+  query.exec(async (err, applications) => {
     if (err) {
       res.status(500).send("500 Internal server error.");
     } else {
-      let result = applications.map(n => {
-        let application = {};
-        application.id = n._id;
-        application.applicantId = n.applicantId;
-        application.applicantName = n.applicantName;
-        if (!applicationType) {
-          application.honor = n.honor;
-          application.scholarship = n.scholarship;
-          application.financialAid = n.financialAid;
-          application.mentor = n.mentor;
-          return application;
-        } else {
-          application[applicationType] = n[applicationType];
-          return application;
-        }
-      });
+      let result = await Promise.all(
+        applications.map(async n => {
+          let application = {};
+          application.id = n._id;
+          application.applicantId = n.applicantId;
+
+          const student = await existenceVerifier(Student, {
+            id: n.applicantId
+          });
+          if (student) {
+            application.class = student.class;
+          }
+
+          application.applicantName = n.applicantName;
+          if (!applicationType) {
+            application.honor = n.honor;
+            application.scholarship = n.scholarship;
+            application.financialAid = n.financialAid;
+            application.mentor = n.mentor;
+            return application;
+          } else {
+            application[applicationType] = n[applicationType];
+            return application;
+          }
+        })
+      );
       if (teacherName) {
         result = result.filter(
           n => n.mentor && Object.keys(n.mentor.status)[0] === teacherName
         );
+      }
+      if (applicantGrade) {
+        result = result.filter(n => n.class[1] === applicantGrade);
       }
       res.setHeader("Content-Type", "application/json; charset=utf-8");
       res.status(200).end(JSON.stringify(result));
@@ -145,41 +161,43 @@ router.post(
             id: req.body.applicantId
           });
 
-          if (!teacher.email) {
-            return;
-          }
-          const html = emailTemplate(
-            teacher.name,
-            "新生导师申请",
-            `您有一份来自 ${application.applicantName} 同学的新生导师申请`,
-            `您有一份来自 ${application.applicantName} 同学的新生导师申请`,
-            `申请陈述：\n${application.mentor.contents.statement}\n\n邮箱：${
-              student.email
-            }\n手机：${student.phone}`,
-            "请您及时处理同学的申请，谢谢！",
-            "https://info.thuee.org",
-            "处理新生导师申请"
-          );
-          const emailOptions = {
-            from: '"电子系信息管理系统" <noreply@thuee.org>', // sender address
-            to: teacher.email, // list of receivers
-            subject: "【新生导师】您收到了一份新的申请", // Subject line
-            text: `${teacher.name}，您好\n您有一份来自 ${
-              application.applicantName
-            } 同学的新生导师申请\n申请陈述：\n${
-              application.mentor.contents.statement
-            }\n邮箱：${student.email}\n手机：${
-              student.phone
-            }\n请您及时前往 https://info.thuee.org 处理同学的申请，谢谢！`, // plain text body
-            html: html // html body
-          };
-
-          emailSender.sendMail(emailOptions, (err, info) => {
-            if (err) {
-              return console.log(err);
+          if (req.body.mentor) {
+            if (!teacher.email) {
+              return;
             }
-            console.log("Message sent: %s", info.messageId);
-          });
+            const html = emailTemplate(
+              teacher.name,
+              "新生导师申请",
+              `您有一份来自 ${application.applicantName} 同学的新生导师申请`,
+              `您有一份来自 ${application.applicantName} 同学的新生导师申请`,
+              `申请陈述：\n${application.mentor.contents.statement}\n\n邮箱：${
+                student.email
+              }\n手机：${student.phone}`,
+              "请您及时处理同学的申请，谢谢！",
+              "https://info.thuee.org",
+              "处理新生导师申请"
+            );
+            const emailOptions = {
+              from: '"电子系信息管理系统" <noreply@thuee.org>', // sender address
+              to: teacher.email, // list of receivers
+              subject: "【新生导师】您收到了一份新的申请", // Subject line
+              text: `${teacher.name}，您好\n您有一份来自 ${
+                application.applicantName
+              } 同学的新生导师申请\n申请陈述：\n${
+                application.mentor.contents.statement
+              }\n邮箱：${student.email}\n手机：${
+                student.phone
+              }\n请您及时前往 https://info.thuee.org 处理同学的申请，谢谢！`, // plain text body
+              html: html // html body
+            };
+
+            emailSender.sendMail(emailOptions, (err, info) => {
+              if (err) {
+                return console.log(err);
+              }
+              console.log("Message sent: %s", info.messageId);
+            });
+          }
         }
       });
     }
@@ -232,37 +250,40 @@ router.put(
           const student = await existenceVerifier(Student, {
             id: application.applicantId
           });
-          if (!student.email) {
-            return;
-          }
-          const html = emailTemplate(
-            student.name,
-            "新生导师申请",
-            `您的新生导师申请状态已更新`,
-            `您的新生导师申请状态已更新`,
-            `当前申请状态：${Object.values(application.mentor.status)[0]}`,
-            "",
-            "https://info.thuee.org",
-            "查看新生导师申请状态"
-          );
-          const emailOptions = {
-            from: '"电子系信息管理系统" <noreply@thuee.org>', // sender address
-            to: student.email, // list of receivers
-            subject: "【新生导师】您的新生导师申请状态已更新", // Subject line
-            text: `${
-              student.name
-            }，您好\n您的新生导师申请状态已更新\n当前申请状态：${
-              Object.values(application.mentor.status)[0]
-            }\n请您前往 https://info.thuee.org 查看详情。`, // plain text body
-            html: html // html body
-          };
 
-          emailSender.sendMail(emailOptions, (err, info) => {
-            if (err) {
-              return console.log(err);
+          if (req.body.mentor) {
+            if (!student.email) {
+              return;
             }
-            console.log("Message sent: %s", info.messageId);
-          });
+            const html = emailTemplate(
+              student.name,
+              "新生导师申请",
+              `您的新生导师申请状态已更新`,
+              `您的新生导师申请状态已更新`,
+              `当前申请状态：${Object.values(application.mentor.status)[0]}`,
+              "",
+              "https://info.thuee.org",
+              "查看新生导师申请状态"
+            );
+            const emailOptions = {
+              from: '"电子系信息管理系统" <noreply@thuee.org>', // sender address
+              to: student.email, // list of receivers
+              subject: "【新生导师】您的新生导师申请状态已更新", // Subject line
+              text: `${
+                student.name
+              }，您好\n您的新生导师申请状态已更新\n当前申请状态：${
+                Object.values(application.mentor.status)[0]
+              }\n请您前往 https://info.thuee.org 查看详情。`, // plain text body
+              html: html // html body
+            };
+
+            emailSender.sendMail(emailOptions, (err, info) => {
+              if (err) {
+                return console.log(err);
+              }
+              console.log("Message sent: %s", info.messageId);
+            });
+          }
         }
       });
     }
