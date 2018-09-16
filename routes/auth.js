@@ -65,6 +65,7 @@ router.post("/", async (req, res) => {
       id: user.id,
       name: user.name,
       class: user.class,
+      grade: user.grade,
       role
     });
   }
