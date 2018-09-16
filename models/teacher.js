@@ -12,6 +12,7 @@
     name: '张三',
     password: '7ads21Adsa', // MD5 哈希
     email: 'zhangsan16@mails.tsinghua.edu.cn',
+    phone: 13900000000,
     department: '电子系',
     infoUpdated: 2018,
     receiveFull: 2018,
@@ -32,6 +33,7 @@ const teacherSchema = new mongoose.Schema(
     name: String,
     password: String,
     email: String,
+    phone: Number,
     department: String,
     infoUpdated: Number,
     receiveFull: Number,

@@ -56,6 +56,7 @@ router.get("/", verifyToken, verifyAuthorizations(["read"]), (req, res) => {
         teacher.infoUpdated = n.infoUpdated;
         teacher.receiveFull = n.receiveFull;
         teacher.totalApplications = n.totalApplications;
+        teacher.phone = n.phone;
         return teacher;
       });
       res.setHeader("Content-Type", "application/json; charset=utf-8");
@@ -85,6 +86,7 @@ router.get("/:id", verifyToken, verifyAuthorizations(["read"]), (req, res) => {
       returnedTeacher.infoUpdated = teacher.infoUpdated;
       returnedTeacher.receiveFull = teacher.receiveFull;
       returnedTeacher.totalApplications = teacher.totalApplications;
+      returnedTeacher.phone = teacher.phone;
 
       res.setHeader("Content-Type", "application/json; charset=utf-8");
       res.status(200).end(JSON.stringify(returnedTeacher));
