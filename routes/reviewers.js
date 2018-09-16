@@ -96,8 +96,7 @@ router.post(
       res.setHeader("Location", "/users/reviewers/" + reviewerExists.id);
       res.status(409).send("409 Conflict: Reviewer already exists.");
     } else {
-      const hashedPassword = bcrypt.hashSync(req.body.password);
-      req.body.password = hashedPassword;
+      req.body.password = bcrypt.hashSync(req.body.password);
       req.body.createdBy = req.id;
 
       const newReviewer = new Reviewer(req.body);
@@ -154,7 +153,9 @@ router.put(
       Object.entries(req.body).forEach(([key]) => reviewer.markModified(key));
       reviewer.updatedAt = new Date().toISOString();
       reviewer.updatedBy = req.id;
-      reviewer.password = bcrypt.hashSync(req.body.password);
+      if (req.body.password) {
+        reviewer.password = bcrypt.hashSync(req.body.password);
+      }
 
       reviewer.save(err => {
         if (err) {

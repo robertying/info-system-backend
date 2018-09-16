@@ -109,8 +109,7 @@ router.post(
       res.setHeader("Location", "/users/teachers/" + teacherExists.id);
       res.status(409).send("409 Conflict: Teacher already exists.");
     } else {
-      const hashedPassword = bcrypt.hashSync(req.body.password);
-      req.body.password = hashedPassword;
+      req.body.password = bcrypt.hashSync(req.body.password);
       req.body.createdBy = req.id;
 
       const newTeacher = new Teacher(req.body);
@@ -149,9 +148,7 @@ router.put(
     if (teacherExists === null) {
       res.status(500).send("500 Internal server error.");
     } else if (teacherExists === false) {
-      if (req.body.password) {
-        req.body.password = bcrypt.hashSync(req.body.password);
-      }
+      req.body.password = bcrypt.hashSync(req.body.password);
       req.body.createdBy = req.id;
       const newTeacher = new Teacher(req.body);
 

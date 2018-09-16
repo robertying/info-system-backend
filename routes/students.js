@@ -103,8 +103,7 @@ router.post(
       res.setHeader("Location", "/users/students/" + studentExists.id);
       res.status(409).send("409 Conflict: Student already exists.");
     } else {
-      const hashedPassword = bcrypt.hashSync(req.body.password);
-      req.body.password = hashedPassword;
+      req.body.password = bcrypt.hashSync(req.body.password);
       req.body.createdBy = req.id;
 
       const newStudent = new Student(req.body);
@@ -161,7 +160,9 @@ router.put(
       Object.entries(req.body).forEach(([key]) => student.markModified(key));
       student.updatedAt = new Date().toISOString();
       student.updatedBy = req.id;
-      student.password = bcrypt.hashSync(req.body.password);
+      if (req.body.password) {
+        student.password = bcrypt.hashSync(req.body.password);
+      }
 
       student.save(err => {
         if (err) {
