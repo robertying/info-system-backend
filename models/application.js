@@ -31,6 +31,22 @@
       },
       attachments: ['奖状-12321454313.zip']
     },
+    scholarship:{
+      status: {
+        "奖学金": 8000
+      },
+      attachments :{
+        "奖学金": []
+      }
+    },
+    financialAid:{
+      status: {
+        "助学金": 8000
+      },
+      attachments :{
+        "助学金": []
+      }
+    },
     applicationType: {
       status: {},
       contents: {},
