@@ -69,11 +69,16 @@ router.get("/", verifyToken, verifyAuthorizations(["read"]), (req, res) => {
             application.mentor = n.mentor;
             return application;
           } else {
-            application[applicationType] = n[applicationType];
-            return application;
+            if (n[applicationType]) {
+              application[applicationType] = n[applicationType];
+              return application;
+            } else {
+              return null;
+            }
           }
         })
       );
+      result = result.filter(n => n != null);
       if (teacherName) {
         result = result.filter(
           n => n.mentor && Object.keys(n.mentor.status)[0] === teacherName
