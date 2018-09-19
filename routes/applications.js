@@ -84,7 +84,11 @@ router.get("/", verifyToken, verifyAuthorizations(["read"]), (req, res) => {
           n => n.mentor && Object.keys(n.mentor.status)[0] === teacherName
         );
       }
-      if (applicantGrade) {
+      if (
+        applicantGrade &&
+        applicantGrade != undefined &&
+        applicantGrade !== "undefined"
+      ) {
         result = result.filter(n => n.class[1] === applicantGrade);
       }
       res.setHeader("Content-Type", "application/json; charset=utf-8");
