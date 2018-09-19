@@ -96,7 +96,7 @@ router.get("/", verifyToken, verifyAuthorizations(["read"]), (req, res) => {
 /**
  * GET
  * 获得特定申请
- * @param {String} id 申请者 ID
+ * @param {String} id 申请 ID
  * @param {String} applicationType 选择想要返回的申请类型的具体内容
  * @returns {JSON} 特定申请信息
  */
@@ -156,17 +156,17 @@ router.post(
           res.setHeader("Location", "/applications/" + application._id);
           res.status(201).send("201 Created.");
 
-          let teacher = await existenceVerifier(Teacher, {
-            name: Object.keys(application.mentor.status)[0]
-          });
-          teacher.totalApplications = teacher.totalApplications + 1;
-          teacher.save();
-
-          const student = await existenceVerifier(Student, {
-            id: req.body.applicantId
-          });
-
           if (req.body.mentor) {
+            let teacher = await existenceVerifier(Teacher, {
+              name: Object.keys(application.mentor.status)[0]
+            });
+            teacher.totalApplications = teacher.totalApplications + 1;
+            teacher.save();
+
+            const student = await existenceVerifier(Student, {
+              id: req.body.applicantId
+            });
+
             if (!teacher.email) {
               return;
             }
@@ -252,11 +252,11 @@ router.put(
         } else {
           res.status(204).send("204 No Content.");
 
-          const student = await existenceVerifier(Student, {
-            id: application.applicantId
-          });
-
           if (req.body.mentor) {
+            const student = await existenceVerifier(Student, {
+              id: application.applicantId
+            });
+
             if (!student.email) {
               return;
             }
