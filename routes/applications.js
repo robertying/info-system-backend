@@ -208,6 +208,90 @@ router.post(
             });
           }
         }
+
+        if (req.body.scholarship && req.body.scholarship.status) {
+          const student = await existenceVerifier(Student, {
+            id: req.body.applicantId
+          });
+
+          if (!student || !student.email) {
+            return;
+          }
+          let statusString = "\n";
+          const status = req.body.scholarship.status;
+          Object.keys(status).forEach(key => {
+            statusString = statusString + key + "：" + status[key] + "\n";
+          });
+          const html = emailTemplate(
+            student.name,
+            "奖学金分配",
+            `您的奖学金分配情况已更新`,
+            `您的奖学金分配情况已更新`,
+            statusString,
+            "奖学金最终分配情况请以院系公示结果为准",
+            "https://info.thuee.org",
+            "查看奖学金分配情况"
+          );
+          const emailOptions = {
+            from: '"电子系信息管理系统" <noreply@thuee.org>', // sender address
+            to: student.email, // list of receivers
+            subject: "【奖学金】您的奖学金分配情况已更新", // Subject line
+            text:
+              `${student.name}，您好\n您的奖学金分配情况已更新\n` +
+              statusString +
+              `可前往 https://info.thuee.org 查看，奖学金最终分配情况请以院系公示结果为准。`, // plain text body
+            html: html // html body
+          };
+
+          emailSender.sendMail(emailOptions, (err, info) => {
+            if (err) {
+              return console.log(err);
+            }
+            console.log("Message sent: %s", info.messageId);
+          });
+        }
+
+        if (req.body.financialAid && req.body.financialAid.status) {
+          const student = await existenceVerifier(Student, {
+            id: req.body.applicantId
+          });
+
+          if (!student || !student.email) {
+            return;
+          }
+          let statusString = "\n";
+          const status = req.body.financialAid.status;
+          Object.keys(status).forEach(key => {
+            statusString = statusString + key + "：" + status[key] + "\n";
+          });
+          const html = emailTemplate(
+            student.name,
+            "助学金资助",
+            `您的助学金资助情况已更新`,
+            `您的助学金资助情况已更新`,
+            statusString,
+            "助学金最终资助情况请以院系公示结果为准",
+            "https://info.thuee.org",
+            "查看助学金资助情况"
+          );
+          const emailOptions = {
+            from: '"电子系信息管理系统" <noreply@thuee.org>', // sender address
+            to: student.email, // list of receivers
+            subject: "【助学金】您的助学金资助情况已更新", // Subject line
+            text:
+              `${student.name}，您好\n您的助学金资助情况已更新\n` +
+              statusString +
+              `可前往 https://info.thuee.org 查看，助学金最终资助情况请以院系公示结果为准。`, // plain text body
+            html: html // html body
+          };
+
+          emailSender.sendMail(emailOptions, (err, info) => {
+            if (err) {
+              return console.log(err);
+            }
+            console.log("Message sent: %s", info.messageId);
+          });
+        }
       });
     }
   }
@@ -283,6 +367,132 @@ router.put(
               }，您好\n您的新生导师申请状态已更新\n当前申请状态：${
                 Object.values(application.mentor.status)[0]
               }\n请您前往 https://info.thuee.org 查看详情。`, // plain text body
+              html: html // html body
+            };
+
+            emailSender.sendMail(emailOptions, (err, info) => {
+              if (err) {
+                return console.log(err);
+              }
+              console.log("Message sent: %s", info.messageId);
+            });
+          }
+
+          if (req.body.honor && req.body.honor.status) {
+            const student = await existenceVerifier(Student, {
+              id: req.body.applicantId
+            });
+
+            if (!student || !student.email) {
+              return;
+            }
+            let statusString = "\n";
+            const status = req.body.honor.status;
+            Object.keys(status).forEach(key => {
+              statusString = statusString + key + "：" + status[key] + "\n";
+            });
+            const html = emailTemplate(
+              student.name,
+              "荣誉申请",
+              `您的荣誉申请结果已更新`,
+              `您的荣誉申请结果已更新`,
+              statusString,
+              "荣誉申请最终结果请以院系公示结果为准",
+              "https://info.thuee.org",
+              "查看荣誉申请结果"
+            );
+            const emailOptions = {
+              from: '"电子系信息管理系统" <noreply@thuee.org>', // sender address
+              to: student.email, // list of receivers
+              subject: "【荣誉申请】您的荣誉申请结果已更新", // Subject line
+              text:
+                `${student.name}，您好\n您的荣誉申请结果已更新\n` +
+                statusString +
+                `可前往 https://info.thuee.org 查看，荣誉申请最终结果请以院系公示结果为准。`, // plain text body
+              html: html // html body
+            };
+
+            emailSender.sendMail(emailOptions, (err, info) => {
+              if (err) {
+                return console.log(err);
+              }
+              console.log("Message sent: %s", info.messageId);
+            });
+          }
+
+          if (req.body.scholarship && req.body.scholarship.status) {
+            const student = await existenceVerifier(Student, {
+              id: req.body.applicantId
+            });
+
+            if (!student || !student.email) {
+              return;
+            }
+            let statusString = "\n";
+            const status = req.body.scholarship.status;
+            Object.keys(status).forEach(key => {
+              statusString = statusString + key + "：" + status[key] + "\n";
+            });
+            const html = emailTemplate(
+              student.name,
+              "奖学金分配",
+              `您的奖学金分配情况已更新`,
+              `您的奖学金分配情况已更新`,
+              statusString,
+              "奖学金最终分配情况请以院系公示结果为准",
+              "https://info.thuee.org",
+              "查看奖学金分配情况"
+            );
+            const emailOptions = {
+              from: '"电子系信息管理系统" <noreply@thuee.org>', // sender address
+              to: student.email, // list of receivers
+              subject: "【奖学金】您的奖学金分配情况已更新", // Subject line
+              text:
+                `${student.name}，您好\n您的奖学金分配情况已更新\n` +
+                statusString +
+                `可前往 https://info.thuee.org 查看，奖学金最终分配情况请以院系公示结果为准。`, // plain text body
+              html: html // html body
+            };
+
+            emailSender.sendMail(emailOptions, (err, info) => {
+              if (err) {
+                return console.log(err);
+              }
+              console.log("Message sent: %s", info.messageId);
+            });
+          }
+
+          if (req.body.financialAid && req.body.financialAid.status) {
+            const student = await existenceVerifier(Student, {
+              id: req.body.applicantId
+            });
+
+            if (!student || !student.email) {
+              return;
+            }
+            let statusString = "\n";
+            const status = req.body.financialAid.status;
+            Object.keys(status).forEach(key => {
+              statusString = statusString + key + "：" + status[key] + "\n";
+            });
+            const html = emailTemplate(
+              student.name,
+              "助学金资助",
+              `您的助学金资助情况已更新`,
+              `您的助学金资助情况已更新`,
+              statusString,
+              "助学金最终资助情况请以院系公示结果为准",
+              "https://info.thuee.org",
+              "查看助学金资助情况"
+            );
+            const emailOptions = {
+              from: '"电子系信息管理系统" <noreply@thuee.org>', // sender address
+              to: student.email, // list of receivers
+              subject: "【助学金】您的助学金资助情况已更新", // Subject line
+              text:
+                `${student.name}，您好\n您的助学金资助情况已更新\n` +
+                statusString +
+                `可前往 https://info.thuee.org 查看，助学金最终资助情况请以院系公示结果为准。`, // plain text body
               html: html // html body
             };
 
