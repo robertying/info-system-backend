@@ -315,6 +315,9 @@ router.put(
     if (applicationExists === null) {
       res.status(500).send("500 Internal server error.");
     } else if (applicationExists === false) {
+      Object.keys(req.body).forEach(
+        key => req.body[key] == null && delete req.body[key]
+      );
       const newApplication = new Application(req.body);
 
       newApplication.save((err, application) => {
@@ -326,8 +329,19 @@ router.put(
         }
       });
     } else {
-      const application = applicationExists;
+      let application = applicationExists;
       _.merge(application, req.body);
+
+      const removeEmpty = obj => {
+        Object.entries(obj).forEach(
+          ([key, val]) =>
+            (val && typeof val === "object" && removeEmpty(val)) ||
+            ((val === null || val === "") && delete obj[key])
+        );
+        return obj;
+      };
+      application = removeEmpty(application);
+
       Object.entries(req.body).forEach(([key]) =>
         application.markModified(key)
       );
