@@ -1,6 +1,6 @@
 {
   "name": "info-system-backend",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Backend for the Information System of EE, Tsinghua University",
   "author": "Robert Ying <yingrui205@gmail.com>",
   "private": true,
@@ -22,6 +22,7 @@
     "morgan": "latest",
     "multer": "latest",
     "nodemailer": "latest",
+    "pdfmake": "latest",
     "spdy": "latest"
   },
   "devDependencies": {
