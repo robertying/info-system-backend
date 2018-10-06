@@ -330,6 +330,15 @@ router.put(
       });
     } else {
       let application = applicationExists;
+      let scholarshipStatus, financialAidStatus;
+      if (req.body.scholarship) {
+        scholarshipStatus = req.body.scholarship.status;
+        delete req.body.scholarship.status;
+      }
+      if (req.body.financialAid) {
+        financialAidStatus = req.body.financialAid.status;
+        delete req.body.financialAid.status;
+      }
       _.merge(application, req.body);
 
       const removeEmpty = obj => {
@@ -347,6 +356,12 @@ router.put(
       );
       application.updatedAt = new Date().toISOString();
       application.updatedBy = req.id;
+      if (scholarshipStatus) {
+        application.scholarship.status = scholarshipStatus;
+      }
+      if (financialAidStatus) {
+        application.financialAid.status = financialAidStatus;
+      }
 
       application.save(async err => {
         if (err) {
