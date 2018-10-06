@@ -1,6 +1,6 @@
 {
   "name": "info-system-backend",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Backend for the Information System of EE, Tsinghua University",
   "author": "Robert Ying <yingrui205@gmail.com>",
   "private": true,
