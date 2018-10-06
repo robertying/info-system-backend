@@ -66,11 +66,11 @@ router.get(
             }
           }
           applications = applications.filter(
-            n => n.class[1] === req.query.grade
+            n => (n.class ? n.class[1] === req.query.grade : false)
           );
 
           let dir;
-          if (process.NODE_ENV === "production") {
+          if (process.env.NODE_ENV === "production") {
             dir = `/tmp/感谢信-无${req.query.grade}年级`;
           } else {
             dir = path.join(
