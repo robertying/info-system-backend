@@ -16,6 +16,7 @@
     "http-errors": "latest",
     "is-number": "latest",
     "jsonwebtoken": "latest",
+    "jszip": "latest",
     "lodash": "latest",
     "mongoose": "latest",
     "mongoose-auto-increment": "latest",
@@ -23,6 +24,7 @@
     "multer": "latest",
     "nodemailer": "latest",
     "pdfmake": "latest",
+    "rimraf": "latest",
     "spdy": "latest"
   },
   "devDependencies": {
