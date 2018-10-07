@@ -25,14 +25,13 @@ const studentsRouter = require("./routes/students");
 const reviewersRouter = require("./routes/reviewers");
 const teachersRouter = require("./routes/teachers");
 const honorsRouter = require("./routes/honors");
-// const scholarshipsRouter = require("./routes/scholarships");
-// const financialAidRouter = require("./routes/financial-aid");
 const authRouter = require("./routes/auth");
 const filesRouter = require("./routes/files");
 const noticesRouter = require("./routes/notices");
 const applicationsRouter = require("./routes/applications");
 const eventsRouter = require("./routes/events");
 const thankLettersRouter = require("./routes/thankLetters");
+const eFormsRouter = require("./routes/eForms");
 
 const app = express();
 
@@ -49,13 +48,12 @@ app.use("/api/users/students", studentsRouter);
 app.use("/api/users/reviewers", reviewersRouter);
 app.use("/api/users/teachers", teachersRouter);
 app.use("/api/honors", honorsRouter);
-// app.use("/api/scholarships", scholarshipsRouter);
-// app.use("/api/financial-aid", financialAidRouter);
 app.use("/api/files", filesRouter);
 app.use("/api/notices", noticesRouter);
 app.use("/api/applications", applicationsRouter);
 app.use("/api/events", eventsRouter);
 app.use("/api/thank-letters", thankLettersRouter);
+app.use("/api/e-forms", eFormsRouter);
 
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "build/index.html"));
