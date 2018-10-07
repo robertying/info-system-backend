@@ -51,6 +51,11 @@ router.get(
   verifyToken,
   verifyAuthorizations(["read"]),
   async (req, res) => {
+    if (req.query.type !== "scholarship" && req.query.type !== "financialAid") {
+      return res.status(422).send("422 Unprocessable Entity: Missing queries.");
+    }
+    const type = req.query.type;
+
     if (req.query.grade) {
       Application.find({}, async (err, applications) => {
         if (err) {
@@ -86,13 +91,13 @@ router.get(
             const application = applications[index];
             if (
               application &&
-              application.scholarship &&
-              application.scholarship.contents
+              application[type] &&
+              application[type].contents
             ) {
-              const titles = Object.keys(application.scholarship.contents);
+              const titles = Object.keys(application[type].contents);
               for (let index = 0; index < titles.length; index++) {
                 const title = titles[index];
-                const content = application.scholarship.contents[title].content;
+                const content = application[type].contents[title].content;
                 const paras = content.split("\n");
                 let parasDefinitions = [
                   {
@@ -100,8 +105,7 @@ router.get(
                     style: "heading"
                   },
                   {
-                    text:
-                      application.scholarship.contents[title].salutation + "：",
+                    text: application[type].contents[title].salutation + "：",
                     style: "salutation"
                   }
                 ];
@@ -181,11 +185,11 @@ router.get(
       });
       if (
         application &&
-        application.scholarship &&
-        application.scholarship.contents &&
-        application.scholarship.contents[title]
+        application[type] &&
+        application[type].contents &&
+        application[type].contents[title]
       ) {
-        const content = application.scholarship.contents[title].content;
+        const content = application[type].contents[title].content;
         const paras = content.split("\n");
         let parasDefinitions = [
           {
@@ -193,7 +197,7 @@ router.get(
             style: "heading"
           },
           {
-            text: application.scholarship.contents[title].salutation + "：",
+            text: application[type].contents[title].salutation + "：",
             style: "salutation"
           }
         ];
