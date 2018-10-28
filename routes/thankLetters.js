@@ -5,6 +5,7 @@ const Student = require("../models/student");
 const existenceVerifier = require("../helpers/existenceVerifier");
 const verifyToken = require("../middlewares/verifyToken");
 const verifyAuthorizations = require("../middlewares/verifyAuthorizations");
+const formatDate = require("../helpers/date");
 const fs = require("fs");
 const JSZip = require("jszip");
 const JSZip2 = require("../helpers/jszip");
@@ -84,13 +85,9 @@ router.get(
                   title: title + "感谢信",
                   salutation: application[type].contents[title].salutation,
                   contents: contents,
-                  department: "电子系",
+                  department: "清华大学电子工程系",
                   class: application.class,
-                  date: new Date()
-                    .toISOString()
-                    .split("T")[0]
-                    .replace("-", "/")
-                    .replace("-", "/")
+                  date: formatDate(new Date())
                 };
 
                 const doc = new Docxtemplater();
@@ -170,13 +167,9 @@ router.get(
           title: title + "感谢信",
           salutation: application[type].contents[title].salutation,
           contents: contents,
-          department: "电子系",
+          department: "清华大学电子工程系",
           class: application.class,
-          date: new Date()
-            .toISOString()
-            .split("T")[0]
-            .replace("-", "/")
-            .replace("-", "/")
+          date: formatDate(new Date())
         };
 
         const doc = new Docxtemplater();
