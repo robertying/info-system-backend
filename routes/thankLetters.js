@@ -5,46 +5,13 @@ const Student = require("../models/student");
 const existenceVerifier = require("../helpers/existenceVerifier");
 const verifyToken = require("../middlewares/verifyToken");
 const verifyAuthorizations = require("../middlewares/verifyAuthorizations");
-const pdfMake = require("pdfmake");
 const fs = require("fs");
 const JSZip = require("jszip");
+const JSZip2 = require("../helpers/jszip");
+const Docxtemplater = require("docxtemplater");
 const rimraf = require("rimraf");
 
 const router = express.Router();
-
-const fontDescriptors = {
-  SimHei: {
-    normal: path.join(__dirname, "..", "/fonts/simhei.ttf"),
-    bold: path.join(__dirname, "..", "/fonts/simhei.ttf"),
-    italics: path.join(__dirname, "..", "/fonts/simhei.ttf"),
-    bolditalics: path.join(__dirname, "..", "/fonts/simhei.ttf")
-  },
-  SimSun: {
-    normal: [path.join(__dirname, "..", "/fonts/simsun.ttc"), "SimSun"],
-    bold: [path.join(__dirname, "..", "/fonts/simsun.ttc"), "SimSun"],
-    italics: [path.join(__dirname, "..", "/fonts/simsun.ttc"), "SimSun"],
-    bolditalics: [path.join(__dirname, "..", "/fonts/simsun.ttc"), "SimSun"]
-  }
-};
-
-const createPdfBinary = docDefinition => {
-  return new Promise(resolve => {
-    const printer = new pdfMake(fontDescriptors);
-    const doc = printer.createPdfKitDocument(docDefinition);
-
-    let chunks = [];
-
-    doc.on("data", chunk => {
-      chunks.push(chunk);
-    });
-
-    doc.on("end", () => {
-      resolve(Buffer.concat(chunks));
-    });
-
-    doc.end();
-  });
-};
 
 router.get(
   "/",
@@ -55,6 +22,12 @@ router.get(
       return res.status(422).send("422 Unprocessable Entity: Missing queries.");
     }
     const type = req.query.type;
+
+    const template = fs.readFileSync(
+      path.join(__dirname, "..", "/config/thankletter-template.docx"),
+      "binary"
+    );
+    const _zip = new JSZip2(template);
 
     if (req.query.grade) {
       Application.find({}, async (err, applications) => {
@@ -87,6 +60,7 @@ router.get(
           if (!fs.existsSync(dir)) {
             fs.mkdirSync(dir);
           }
+
           for (let index = 0; index < applications.length; index++) {
             const application = applications[index];
             if (
@@ -99,66 +73,54 @@ router.get(
                 const title = titles[index];
                 const content = application[type].contents[title].content;
                 const paras = content.split("\n");
-                let parasDefinitions = [
-                  {
-                    text: "感谢信",
-                    style: "heading"
-                  },
-                  {
-                    text: application[type].contents[title].salutation + "：",
-                    style: "salutation"
-                  }
-                ];
+                let contents = [];
                 for (let index = 0; index < paras.length; index++) {
                   const text = paras[index];
-                  parasDefinitions.push({
-                    text: text,
-                    style: "normal"
+                  contents.push({
+                    content: text.trim()
                   });
                 }
-                const docDefinition = {
-                  content: parasDefinitions,
-                  styles: {
-                    heading: {
-                      fontSize: 15,
-                      font: "SimHei",
-                      bold: true,
-                      alignment: "center",
-                      lineHeight: 1.5,
-                      marginTop: 40
-                    },
-                    salutation: {
-                      fontSize: 12,
-                      font: "SimSun",
-                      lineHeight: 2,
-                      marginLeft: 50,
-                      marginRight: 50,
-                      marginTop: 15,
-                      marginBottom: 5,
-                      preserveLeadingSpaces: false
-                    },
-                    normal: {
-                      fontSize: 12,
-                      font: "SimSun",
-                      lineHeight: 2,
-                      marginLeft: 50,
-                      marginRight: 50,
-                      preserveLeadingSpaces: false,
-                      leadingIndent: 25
-                    }
-                  }
+                const data = {
+                  title: title + "感谢信",
+                  salutation: application[type].contents[title].salutation,
+                  contents: contents,
+                  department: "电子系",
+                  class: application.class,
+                  date: new Date()
+                    .toISOString()
+                    .split("T")[0]
+                    .replace("-", "/")
+                    .replace("-", "/")
                 };
 
-                const binary = await createPdfBinary(docDefinition);
+                const doc = new Docxtemplater();
+                doc.loadZip(_zip);
+                doc.setData(data);
+
+                try {
+                  doc.render();
+                } catch (error) {
+                  const e = {
+                    message: error.message,
+                    name: error.name,
+                    stack: error.stack,
+                    properties: error.properties
+                  };
+                  console.log(JSON.stringify({ error: e }));
+                  res.status(500).send("Internal server error");
+                }
+
+                const buf = doc.getZip().generate({ type: "nodebuffer" });
                 fs.writeFileSync(
                   `${dir}/${application.applicantName}-${
                     application.applicantId
-                  }-${title}.pdf`,
-                  binary
+                  }-${title}.docx`,
+                  buf
                 );
               }
             }
           }
+
           const zip = new JSZip();
           const folder = zip.folder(dir);
           fs.readdirSync(dir).forEach(file => {
@@ -180,9 +142,15 @@ router.get(
           .send("422 Unprocessable Entity: Missing queries.");
       }
 
-      const application = await existenceVerifier(Application, {
+      let application = await existenceVerifier(Application, {
         _id: req.query.id
       });
+      const student = await existenceVerifier(Student, {
+        id: application.applicantId
+      });
+      if (student) {
+        application.class = student.class;
+      }
       if (
         application &&
         application[type] &&
@@ -191,60 +159,47 @@ router.get(
       ) {
         const content = application[type].contents[title].content;
         const paras = content.split("\n");
-        let parasDefinitions = [
-          {
-            text: "感谢信",
-            style: "heading"
-          },
-          {
-            text: application[type].contents[title].salutation + "：",
-            style: "salutation"
-          }
-        ];
+        let contents = [];
         for (let index = 0; index < paras.length; index++) {
           const text = paras[index];
-          parasDefinitions.push({
-            text: text,
-            style: "normal"
+          contents.push({
+            content: text.trim()
           });
         }
-        const docDefinition = {
-          content: parasDefinitions,
-          styles: {
-            heading: {
-              fontSize: 15,
-              font: "SimHei",
-              bold: true,
-              alignment: "center",
-              lineHeight: 1.5,
-              marginTop: 40
-            },
-            salutation: {
-              fontSize: 12,
-              font: "SimSun",
-              lineHeight: 2,
-              marginLeft: 50,
-              marginRight: 50,
-              marginTop: 15,
-              marginBottom: 5,
-              preserveLeadingSpaces: false
-            },
-            normal: {
-              fontSize: 12,
-              font: "SimSun",
-              lineHeight: 2,
-              marginLeft: 50,
-              marginRight: 50,
-              preserveLeadingSpaces: false,
-              leadingIndent: 25
-            }
-          }
+        const data = {
+          title: title + "感谢信",
+          salutation: application[type].contents[title].salutation,
+          contents: contents,
+          department: "电子系",
+          class: application.class,
+          date: new Date()
+            .toISOString()
+            .split("T")[0]
+            .replace("-", "/")
+            .replace("-", "/")
         };
 
-        createPdfBinary(docDefinition).then(binary => {
-          res.set("Content-Type", "application/pdf");
-          res.status(200).send(binary);
-        });
+        const doc = new Docxtemplater();
+        doc.loadZip(_zip);
+        doc.setData(data);
+
+        try {
+          doc.render();
+        } catch (error) {
+          const e = {
+            message: error.message,
+            name: error.name,
+            stack: error.stack,
+            properties: error.properties
+          };
+          console.log(JSON.stringify({ error: e }));
+          res.status(500).send("Internal server error");
+        }
+
+        const buf = doc.getZip().generate({ type: "nodebuffer" });
+
+        res.set("Content-Type", "application/docx");
+        res.status(200).send(buf);
       } else {
         res.status(404).send("404 Not Found: Application does not exist.");
       }
