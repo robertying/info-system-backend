@@ -50,14 +50,17 @@ router.get(
               const titles = Object.keys(application[type].attachments);
               for (let index = 0; index < titles.length; index++) {
                 const title = titles[index];
-                const attachment = application[type].attachments[title][0];
-                const ext = /(?:\.([^.]+))?$/.exec(attachment)[1];
-                zip.file(
-                  `${application.applicantName}-${
-                    application.applicantId
-                  }-${title}.${ext}`,
-                  fs.readFileSync(path.join(dir, attachment))
-                );
+                const attachments = application[type].attachments[title];
+                for (let iindex = 0; iindex < attachments.length; iindex++) {
+                  const attachment = attachments[iindex];
+                  const ext = /(?:\.([^.]+))?$/.exec(attachment)[1];
+                  zip.file(
+                    `${application.applicantName}-${
+                      application.applicantId
+                    }-${title}-${iindex}.${ext}`,
+                    fs.readFileSync(path.join(dir, attachment))
+                  );
+                }
               }
             }
           }
