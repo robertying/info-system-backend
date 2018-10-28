@@ -32,6 +32,7 @@ const applicationsRouter = require("./routes/applications");
 const eventsRouter = require("./routes/events");
 const thankLettersRouter = require("./routes/thankLetters");
 const eFormsRouter = require("./routes/eForms");
+const otherMaterialsRouter = require("./routes/otherMaterials");
 
 const app = express();
 
@@ -54,6 +55,7 @@ app.use("/api/applications", applicationsRouter);
 app.use("/api/events", eventsRouter);
 app.use("/api/thank-letters", thankLettersRouter);
 app.use("/api/e-forms", eFormsRouter);
+app.use("/api/other-materials", otherMaterialsRouter);
 
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "build/index.html"));
