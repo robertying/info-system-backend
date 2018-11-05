@@ -62,6 +62,9 @@ router.get(
             fs.mkdirSync(dir);
           }
 
+          const doc = new Docxtemplater();
+          doc.loadZip(_zip);
+
           for (let index = 0; index < applications.length; index++) {
             const application = applications[index];
             if (
@@ -90,10 +93,7 @@ router.get(
                   date: formatDate(new Date())
                 };
 
-                const doc = new Docxtemplater();
-                doc.loadZip(_zip);
                 doc.setData(data);
-
                 try {
                   doc.render();
                 } catch (error) {
